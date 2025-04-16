@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensures proper scaling on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catch the Emoji - Mobile & PC Edition</title>
+  <style>
+    /* GENERAL STYLES FOR ALL DEVICES */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #800080; /* Purple background */
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* SCREEN BASE STYLE */
+    .screen {
+      display: none;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    /* HOME SCREEN */
+    #home-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, #4a148c, #880e4f, #4a148c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      padding: 20px;
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    #home-screen h1 {
+      font-size: 3.5rem;
+      font-family: Fantasy, sans-serif;
+      margin: 0;
+      color: #fff;
+      text-shadow: 0 0 20px #ff80ab, 0 0 30px #f50057, 0 0 40px #c51162;
+      animation: textBounce 3s infinite ease-in-out;
+    }
+    @keyframes textBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .button {
+      background-color: #ff80ab;
+      border: none;
+      color: #fff;
+      font-size: 1.8rem;
+      border-radius: 40px;
+      padding: 15px 50px;
+      margin-top: 30px;
+      transition: transform 0.5s, box-shadow 0.5s ease;
+      box-shadow: 0px 10px 30px rgba(255, 128, 171, 0.5);
+      cursor: pointer;
+    }
+    .button:active, .button:hover {
+      background-color: #f50057;
+      transform: scale(1.2);
+      box-shadow: 0px 15px 40px rgba(255, 64, 129, 0.8);
+    }
+    /* Floating Decorative Emojis on Home Screen */
+    .emoji {
+      position: absolute;
+      font-size: 2.5rem;
+      opacity: 0.8;
+      animation: emojiOrbit 6s infinite linear;
+    }
+    .emoji:nth-child(1) {
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    .emoji:nth-child(2) {
+      top: 10%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+    .emoji:nth-child(3) {
+      bottom: 15%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+    @keyframes emojiOrbit {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1.1); }
+    }
+    /* ABOUT DEVELOPER SCREEN */
+    #about-developer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #4a148c, #880e4f, #4a148c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    #about-developer h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      font-family: Fantasy, sans-serif;
+      color: #fff;
+      text-shadow: 0 0 20px #ff80ab, 0 0 30px #f50057;
+    }
+    #about-developer p {
+      font-size: 1.2rem;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    /* GAME SCREEN */
+    #game-container {
+      background-color: #800080;
+      position: relative;
+      box-sizing: border-box;
+    }
+    /* Score & Level Board */
+    #score-board {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      z-index: 10;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 8px 15px;
+      border-radius: 10px;
+      display: flex;
+      gap: 15px;
+    }
+    /* Catcher */
+    #catcher {
+      position: absolute;
+      bottom: 15%;
+      background-color: #000;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+      transition: transform 0.2s;
+    }
+    #catcher:active {
+      transform: scale(0.95);
+    }
+    /* Control Buttons Container (for mobile only) */
+    .control-buttons {
+      position: absolute;
+      bottom: 5%;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 15;
+    }
+    .control-button {
+      background-color: #ff80ab;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      border-radius: 30px;
+      padding: 10px 20px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+    .control-button:active {
+      background-color: #f50057;
+      transform: scale(1.1);
+    }
+    /* Emoji Ball Styles */
+    .ball {
+      position: absolute;
+      font-size: 3rem;
+      text-align: center;
+      line-height: 1;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    /* Confetti for Level Up */
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      opacity: 0.8;
+      animation: fall 3s linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+    }
+    /* Level Up Message Animation */
+    .level-up {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      color: #ffeb3b;
+      font-size: 3.5rem;
+      font-weight: bold;
+      z-index: 20;
+      animation: levelUpAnim 1s forwards;
+      text-shadow: 0 0 20px #ffe082;
+    }
+    @keyframes levelUpAnim {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    /* SAD SCREEN (Lose Screen) */
+    #lose-screen {
+      background-color: #800080;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+    }
+    #lose-screen h1 {
+      font-size: 3.5rem;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+    #lose-screen p {
+      font-size: 1.5rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- HOME SCREEN -->
+  <div id="home-screen" class="screen" style="display: flex;">
+    <div class="emoji">🍎</div>
+    <div class="emoji">⭐</div>
+    <div class="emoji">😊</div>
+    <h1>Catch the Emoji</h1>
+    <button class="button" id="start-game">Start Game</button>
+    <button class="button" id="about-btn">About Developer</button>
+  </div>
+
+  <!-- ABOUT DEVELOPER SCREEN -->
+  <div id="about-developer" class="screen">
+    <h1>About Developer</h1>
+    <p>
+      This game was developed by Lakshya pilaniya.<br /><br />
+     </p>
+    <button class="button" id="back-home">Back</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-container" class="screen">
+    <div id="score-board">
+      <span id="score-indicator">Score: 0</span>
+      <span id="level-indicator">Level: 1</span>
+    </div>
+    <div id="catcher"></div>
+    <div class="control-buttons">
+      <button class="control-button" id="left-button">Left</button>
+      <button class="control-button" id="right-button">Right</button>
+    </div>
+  </div>
+
+  <!-- SAD SCREEN -->
+  <div id="lose-screen" class="screen">
+    <h1>You Lose 😢</h1>
+    <p>So very sad... Game Over!</p>
+    <button class="button" id="retry">Retry</button>
+    <button class="button" id="home">Home</button>
+  </div>
+
+  <script>
+    // Wait until the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // ELEMENT REFERENCES
+      const homeScreen = document.getElementById("home-screen");
+      const aboutScreen = document.getElementById("about-developer");
+      const gameContainer = document.getElementById("game-container");
+      const loseScreen = document.getElementById("lose-screen");
+      const startGameButton = document.getElementById("start-game");
+      const aboutBtn = document.getElementById("about-btn");
+      const backHomeBtn = document.getElementById("back-home");
+      const retryButton = document.getElementById("retry");
+      const homeButton = document.getElementById("home");
+      const scoreIndicator = document.getElementById("score-indicator");
+      const levelIndicator = document.getElementById("level-indicator");
+      const catcher = document.getElementById("catcher");
+      const leftButton = document.getElementById("left-button");
+      const rightButton = document.getElementById("right-button");
+
+      // AUDIO SETUP
+      const catchSound = new Audio("https://www.soundjay.com/button/beep-07.mp3");
+      const gameoverSound = new Audio("https://www.soundjay.com/button/beep-05.mp3");
+
+      let balls = [];
+      let level = 1;
+      let score = 0;
+      let gameRunning = true;
+      let allBallsThrown = false;
+      let moveDirection = 0;
+      const moveSpeed = 10;
+      let catcherLeft = 0;
+
+      // Set initial catcher dimensions and center it
+      function setCatcher() {
+        catcher.style.width = "20%";
+        catcher.style.height = "5%";
+        catcherLeft = (gameContainer.offsetWidth - catcher.offsetWidth) / 2;
+        catcher.style.left = catcherLeft + "px";
+      }
+      setCatcher();
+      window.addEventListener("resize", setCatcher);
+
+      // Update catcher position (called by both keyboard / button events)
+      function updateCatcherPosition() {
+        const maxLeft = gameContainer.offsetWidth - catcher.offsetWidth;
+        catcherLeft += moveDirection * moveSpeed;
+        if (catcherLeft < 0) { catcherLeft = 0; }
+        if (catcherLeft > maxLeft) { catcherLeft = maxLeft; }
+        catcher.style.left = catcherLeft + "px";
+        if (moveDirection !== 0) {
+          requestAnimationFrame(updateCatcherPosition);
+        }
+      }
+
+      // Keyboard events for PC
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          moveDirection = -1;
+          updateCatcherPosition();
+        } else if (e.key === "ArrowRight") {
+          moveDirection = 1;
+          updateCatcherPosition();
+        }
+      });
+      document.addEventListener("keyup", () => { moveDirection = 0; });
+
+      // Touch control for game container (optional additional control)
+      gameContainer.addEventListener("touchstart", (e) => {
+        let touchX = e.touches[0].clientX;
+        moveDirection = (touchX < window.innerWidth / 2) ? -1 : 1;
+        updateCatcherPosition();
+      });
+      gameContainer.addEventListener("touchend", () => {
+        moveDirection = 0;
+      });
+
+      // Left Button Events (mobile)
+      leftButton.addEventListener("mousedown", () => {
+        moveDirection = -1;
+        updateCatcherPosition();
+      });
+      leftButton.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        moveDirection = -1;
+        updateCatcherPosition();
+      });
+      leftButton.addEventListener("mouseup", () => { moveDirection = 0; });
+      leftButton.addEventListener("touchend", () => { moveDirection = 0; });
+
+      // Right Button Events (mobile)
+      rightButton.addEventListener("mousedown", () => {
+        moveDirection = 1;
+        updateCatcherPosition();
+      });
+      rightButton.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        moveDirection = 1;
+        updateCatcherPosition();
+      });
+      rightButton.addEventListener("mouseup", () => { moveDirection = 0; });
+      rightButton.addEventListener("touchend", () => { moveDirection = 0; });
+
+      // Hide control buttons on PC (if no touch support)
+      if (!("ontouchstart" in window)) {
+        const ctrlBtns = document.querySelector(".control-buttons");
+        if (ctrlBtns) { ctrlBtns.style.display = "none"; }
+      }
+
+      // Create a new emoji ball
+      function createBall() {
+        const ball = document.createElement("div");
+        ball.classList.add("ball");
+        const emojiList = ["😃", "🍎", "⭐", "🪐", "😊", "🍇", "🍉", "🎉"];
+        ball.textContent = emojiList[Math.floor(Math.random() * emojiList.length)];
+        const ballWidth = gameContainer.offsetWidth * 0.07;
+        const maxLeft = gameContainer.offsetWidth - ballWidth;
+        ball.style.left = (Math.random() * maxLeft) + "px";
+        ball.style.top = "0px";
+        ball.speedY = 2 + level;
+        balls.push(ball);
+        gameContainer.appendChild(ball);
+      }
+
+      // Show Level Up Animation
+      function showLevelUpAnimation() {
+        const levelUpDiv = document.createElement("div");
+        levelUpDiv.classList.add("level-up");
+        levelUpDiv.textContent = "Level Up!";
+        gameContainer.appendChild(levelUpDiv);
+        setTimeout(() => { levelUpDiv.remove(); }, 1500);
+      }
+
+      // Launch Confetti Effect
+      function launchConfetti() {
+        for (let i = 0; i < 30; i++) {
+          let confetti = document.createElement("div");
+          confetti.classList.add("confetti");
+          confetti.style.left = Math.random() * 100 + "%";
+          confetti.style.top = "-10%";
+          confetti.style.backgroundColor = "hsl(" + (Math.random() * 360) + ", 100%, 50%)";
+          gameContainer.appendChild(confetti);
+          setTimeout(() => { confetti.remove(); }, 3000);
+        }
+      }
+
+      // Start a new level
+      function startLevel() {
+        balls.forEach(ball => ball.remove());
+        balls = [];
+        gameRunning = true;
+        allBallsThrown = false;
+        levelIndicator.textContent = "Level: " + level;
+        let ballCount = 5 + (level - 1);
+        let ballIndex = 0;
+        function throwBall() {
+          if (ballIndex < ballCount) {
+            createBall();
+            ballIndex++;
+            setTimeout(throwBall, 1000);
+          } else {
+            allBallsThrown = true;
+          }
+        }
+        throwBall();
+        moveBalls();
+      }
+
+      // Move balls, check collisions, and manage game state
+      function moveBalls() {
+        if (!gameRunning) return;
+        balls.slice().forEach(ball => {
+          const ballRect = ball.getBoundingClientRect();
+          const catcherRect = catcher.getBoundingClientRect();
+          ball.style.top = (ballRect.top + ball.speedY) + "px";
+
+          // Check collision: if ball touches catcher, play catch sound and update score
+          if (
+            ballRect.bottom >= catcherRect.top &&
+            ballRect.left >= catcherRect.left &&
+            ballRect.right <= catcherRect.right
+          ) {
+            score++;
+            scoreIndicator.textContent = "Score: " + score;
+            catchSound.currentTime = 0;
+            catchSound.play();
+            ball.remove();
+            balls.splice(balls.indexOf(ball), 1);
+          }
+
+          // If ball is missed (falls below container), game over (Sad Screen)
+          if (ballRect.bottom > gameContainer.offsetHeight) {
+            gameRunning = false;
+            gameoverSound.currentTime = 0;
+            gameoverSound.play();
+            showScreen(loseScreen);
+          }
+        });
+
+        // When all balls are thrown and caught, level up and start next level
+        if (allBallsThrown && balls.length === 0 && gameRunning) {
+          gameRunning = false;
+          launchConfetti();
+          showLevelUpAnimation();
+          setTimeout(() => {
+            level++;
+            startLevel();
+          }, 2000);
+          return;
+        }
+        requestAnimationFrame(moveBalls);
+      }
+
+      // Screen switching function
+      function showScreen(screen) {
+        homeScreen.style.display = "none";
+        aboutScreen.style.display = "none";
+        gameContainer.style.display = "none";
+        loseScreen.style.display = "none";
+        screen.style.display = "flex";
+      }
+
+      // Button event listeners
+      startGameButton.addEventListener("click", () => {
+        score = 0;
+        level = 1;
+        scoreIndicator.textContent = "Score: " + score;
+        showScreen(gameContainer);
+        startLevel();
+      });
+      aboutBtn.addEventListener("click", () => {
+        showScreen(aboutScreen);
+      });
+      backHomeBtn.addEventListener("click", () => {
+        showScreen(homeScreen);
+      });
+      retryButton.addEventListener("click", () => {
+        score = 0;
+        level = 1;
+        scoreIndicator.textContent = "Score: " + score;
+        showScreen(gameContainer);
+        startLevel();
+      });
+      homeButton.addEventListener("click", () => {
+        showScreen(homeScreen);
+      });
+
+      // Begin with the Home screen visible
+      showScreen(homeScreen);
+    });
+  </script>
+</body>
+</html>
